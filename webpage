@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MotionAE — Motion Autoencoder</title>
+  <meta name="description" content="MotionAE: A simple motion autoencoder on HumanML3D with visuals, metrics, and code links." />
+  <script defer src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+    .prose pre { white-space: pre-wrap; }
+  </style>
+</head>
+<body class="bg-neutral-950 text-neutral-100">
+  <!-- Sticky header -->
+  <header class="sticky top-0 z-50 backdrop-blur bg-neutral-950/70 border-b border-neutral-800">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="#top" class="text-lg font-semibold">MotionAE</a>
+      <nav class="hidden md:flex gap-6 text-sm text-neutral-300">
+        <a href="#paper" class="hover:text-white">Paper</a>
+        <a href="#code" class="hover:text-white">Code</a>
+        <a href="#abstract" class="hover:text-white">Abstract</a>
+        <a href="#architecture" class="hover:text-white">Architecture</a>
+        <a href="#metrics" class="hover:text-white">Metrics</a>
+        <a href="#results" class="hover:text-white">Results</a>
+        <a href="#reproduce" class="hover:text-white">Reproduce</a>
+        <a href="#bibtex" class="hover:text-white">BibTeX</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section id="top" class="border-b border-neutral-800 bg-gradient-to-b from-neutral-900 to-neutral-950">
+    <div class="max-w-6xl mx-auto px-4 py-16 md:py-24">
+      <p class="text-sm uppercase tracking-widest text-neutral-400">Project Preview</p>
+      <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mt-2">MotionAE: Motion Autoencoder on HumanML3D</h1>
+      <p class="mt-4 text-neutral-300 max-w-3xl">A minimal autoencoder trained on HumanML3D for motion compression and reconstruction. This page shows the architecture, metrics (MSE/MAE/L2), and example visualizations, with links to code and environment.</p>
+
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a id="paper" href="#" class="px-3 py-1 rounded-full border border-neutral-700 hover:bg-neutral-800">arXiv (coming soon)</a>
+        <a id="code" href="#" class="px-3 py-1 rounded-full border border-neutral-700 hover:bg-neutral-800">Code</a>
+        <a href="#reproduce" class="px-3 py-1 rounded-full border border-neutral-700 hover:bg-neutral-800">Environment.yml</a>
+      </div>
+
+      <!-- Author block -->
+      <div class="mt-8 text-neutral-300">
+        <p class="text-sm">Issam Alzouby</p>
+        <p class="text-xs text-neutral-400">UNC Charlotte</p>
+      </div>
+
+      <!-- Cover media -->
+      <div class="mt-10 grid md:grid-cols-2 gap-4">
+        <figure class="bg-neutral-900 rounded-2xl p-3 border border-neutral-800">
+          <img src="assets/teaser_reconstruction.gif" alt="Original vs Reconstructed motion teaser" class="w-full h-auto rounded-xl" />
+          <figcaption class="text-xs text-neutral-400 mt-2">Original vs Reconstructed joint trajectories (teaser). Replace with your own GIF.</figcaption>
+        </figure>
+        <figure class="bg-neutral-900 rounded-2xl p-3 border border-neutral-800">
+          <img src="assets/teaser_latent.png" alt="Latent space scatter" class="w-full h-auto rounded-xl" />
+          <figcaption class="text-xs text-neutral-400 mt-2">Latent space preview (e.g., TSNE/UMAP). Replace with your own plot.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Abstract / Contributions -->
+  <section id="abstract" class="border-b border-neutral-800">
+    <div class="max-w-6xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-10">
+      <div class="prose prose-invert">
+        <h2>Abstract</h2>
+        <p>MotionAE is a lightweight autoencoder for human motion sequences built for clarity and speed. Trained on HumanML3D (SMPL‑H, 22 joints, 196 frames, 263‑D features), MotionAE learns a compact latent representation that reconstructs trajectories with low error while remaining straightforward to extend to VAE/VQ‑VAE variants.</p>
+      </div>
+      <div class="prose prose-invert">
+        <h2>Contributions</h2>
+        <ul>
+          <li>Simple, reproducible baseline for motion reconstruction on HumanML3D.</li>
+          <li>Clean PyTorch code with <code>environment.yml</code> and scripts to train/validate/visualize.</li>
+          <li>Ready‑made figures (joint curves, latent previews) and a one‑page project site.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture -->
+  <section id="architecture" class="border-b border-neutral-800 bg-neutral-950">
+    <div class="max-w-6xl mx-auto px-4 py-12">
+      <h2 class="text-2xl font-semibold">Architecture</h2>
+      <p class="text-neutral-300 mt-2">A standard MLP autoencoder. Replace the diagram below with your own (SVG/PNG).</p>
+      <div class="mt-6 bg-neutral-900 rounded-2xl p-5 border border-neutral-800">
+        <img src="assets/architecture.png" alt="Architecture diagram" class="w-full h-auto rounded-xl"/>
+      </div>
+      <div class="mt-4 grid md:grid-cols-3 gap-4 text-sm text-neutral-300">
+        <div class="p-4 rounded-xl bg-neutral-900 border border-neutral-800">
+          <div class="font-semibold">Input</div>
+          <div>196 × 263 flattened</div>
+        </div>
+        <div class="p-4 rounded-xl bg-neutral-900 border border-neutral-800">
+          <div class="font-semibold">Latent</div>
+          <div>512‑D</div>
+        </div>
+        <div class="p-4 rounded-xl bg-neutral-900 border border-neutral-800">
+          <div class="font-semibold">Loss</div>
+          <div>MSE (reconstruction)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Metrics -->
+  <section id="metrics" class="border-b border-neutral-800">
+    <div class="max-w-6xl mx-auto px-4 py-12">
+      <h2 class="text-2xl font-semibold">Validation Metrics</h2>
+      <p class="text-neutral-300 mt-2">From <code>aevalidate.py</code> (averaged over the held‑out split).</p>
+      <div class="mt-6 overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="text-left text-neutral-400">
+              <th class="py-2 pr-6">Metric</th>
+              <th class="py-2 pr-6">Value</th>
+              <th class="py-2">Notes</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-neutral-800">
+            <tr>
+              <td class="py-2 pr-6">MSE</td>
+              <td class="py-2 pr-6"><span id="mse">—</span></td>
+              <td class="py-2">Mean Squared Error (per sample mean)</td>
+            </tr>
+            <tr>
+              <td class="py-2 pr-6">MAE</td>
+              <td class="py-2 pr-6"><span id="mae">—</span></td>
+              <td class="py-2">Mean Absolute Error (per sample mean)</td>
+            </tr>
+            <tr>
+              <td class="py-2 pr-6">L2</td>
+              <td class="py-2 pr-6"><span id="l2">—</span></td>
+              <td class="py-2">Euclidean distance</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-xs text-neutral-500 mt-2">Tip: export a small <code>metrics.json</code> and fetch it below to auto‑fill these numbers.</p>
+    </div>
+  </section>
+
+  <!-- Results -->
+  <section id="results" class="border-b border-neutral-800 bg-neutral-950">
+    <div class="max-w-6xl mx-auto px-4 py-12">
+      <h2 class="text-2xl font-semibold">Results & Visualizations</h2>
+      <p class="text-neutral-300 mt-2">Drop your PNGs/GIFs into <code>assets/</code> and update captions.</p>
+      <div class="mt-6 grid md:grid-cols-3 gap-4">
+        <figure class="bg-neutral-900 rounded-2xl p-3 border border-neutral-800">
+          <img src="assets/joint0_x.png" alt="Joint 0 X over time" class="w-full h-auto rounded-xl" />
+          <figcaption class="text-xs text-neutral-400 mt-2">Joint 0 — X position vs time (original vs reconstructed).</figcaption>
+        </figure>
+        <figure class="bg-neutral-900 rounded-2xl p-3 border border-neutral-800">
+          <img src="assets/joint5_y.png" alt="Joint 5 Y over time" class="w-full h-auto rounded-xl" />
+          <figcaption class="text-xs text-neutral-400 mt-2">Joint 5 — Y position vs time.</figcaption>
+        </figure>
+        <figure class="bg-neutral-900 rounded-2xl p-3 border border-neutral-800">
+          <img src="assets/joint10_z.png" alt="Joint 10 Z over time" class="w-full h-auto rounded-xl" />
+          <figcaption class="text-xs text-neutral-400 mt-2">Joint 10 — Z position vs time.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reproduce -->
+  <section id="reproduce" class="border-b border-neutral-800">
+    <div class="max-w-6xl mx-auto px-4 py-12 prose prose-invert">
+      <h2>Reproduce</h2>
+      <ol>
+        <li><strong>Create env</strong>
+          <pre><code>conda env create -f environment.yml
+conda activate momask
+python MotionAE.py  # trains and saves autoencoder_humanml3d.pth
+python aevalidate.py # prints MSE / MAE / L2 and optionally writes metrics.json
+python visualize.py  # generates plots into assets/</code></pre>
+        </li>
+        <li><strong>Serve this page</strong>
+          <pre><code># Option A: GitHub Pages (static)
+# 1) Put this index.html and an assets/ folder in a repo
+# 2) Settings → Pages → Deploy from main → /(root)
+
+# Option B: Vercel/Netlify (drag-and-drop)
+# 1) vercel deploy  (or use dashboard)
+</code></pre>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- BibTeX -->
+  <section id="bibtex" class="border-b border-neutral-800 bg-neutral-950">
+    <div class="max-w-6xl mx-auto px-4 py-12 prose prose-invert">
+      <h2>BibTeX</h2>
+      <pre><code>@misc{alzouby2025motionae,
+  title  = {MotionAE: A Minimal Motion Autoencoder Baseline},
+  author = {Issam Alzouby},
+  year   = {2025},
+  url    = {https://&lt;your-site&gt;}
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-10 text-center text-sm text-neutral-500">
+    <div class="max-w-6xl mx-auto px-4">
+      <p>© <span id="year"></span> MotionAE • Built with Tailwind • <a href="#top" class="underline decoration-dotted">Back to top</a></p>
+    </div>
+  </footer>
+
+  <!-- Small helper: load metrics.json if present -->
+  <script>
+    (async () => {
+      document.getElementById('year').textContent = new Date().getFullYear();
+      try {
+        const r = await fetch('assets/metrics.json');
+        if (!r.ok) return;
+        const m = await r.json();
+        if (m.mse) document.getElementById('mse').textContent = m.mse.toFixed(6);
+        if (m.mae) document.getElementById('mae').textContent = m.mae.toFixed(6);
+        if (m.l2)  document.getElementById('l2').textContent  = m.l2.toFixed(6);
+      } catch (e) { /* no-op */ }
+    })();
+  </script>
+</body>
+</html>
