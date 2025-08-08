@@ -1,0 +1,24 @@
+name: MotionAE
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.10
+  - pip
+  - pytorch
+  - torchvision
+  - torchaudio
+  - pytorch-cuda=12.1  # 🧠 This installs the correct CUDA, cuDNN, cuBLAS, etc.
+  - numpy
+  - pandas
+  - matplotlib
+  - scikit-learn
+  - jupyter
+  - tqdm
+  - datasets
+  - pip:
+      - transformers
+      - einops
