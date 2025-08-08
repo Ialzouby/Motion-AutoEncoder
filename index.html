@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MotionAE — Motion Autoencoder</title>
   <meta name="description" content="MotionAE: A simple motion autoencoder on HumanML3D with visuals, metrics, and code links." />
+  <!-- Configure Tailwind to use class-based dark mode -->
+  <script>
+    window.tailwind = { config: { darkMode: 'class' } };
+  </script>
   <script defer src="https://cdn.tailwindcss.com"></script>
   <style>
     html { scroll-behavior: smooth; }
@@ -55,6 +59,7 @@
         <a id="paper" href="#" class="px-3 py-1 rounded-full border border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900">arXiv (coming soon)</a>
         <a id="code" href="#" class="px-3 py-1 rounded-full border border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900">Code</a>
         <a href="#reproduce" class="px-3 py-1 rounded-full border border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900">Environment.yml</a>
+        <a id="weights" href="https://drive.google.com/file/d/1dYFW_9yYElH_7etZhHoHO2bsn7DB_cQI/view?usp=sharing" target="_blank" rel="noopener" class="px-3 py-1 rounded-full border border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900">Pretrained Weights</a>
       </div>
 
       <!-- Author block -->
@@ -175,6 +180,31 @@
           <img src="assets/joint10_z.png" alt="Joint 10 Z over time" class="w-full h-auto rounded-xl" />
           <figcaption class="text-xs text-neutral-500 mt-2 dark:text-neutral-400">Joint 10 — Z position vs time.</figcaption>
         </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Weights -->
+  <section id="weights-section" class="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-950">
+    <div class="max-w-6xl mx-auto px-4 py-12">
+      <h2 class="text-2xl font-semibold mb-4">Pretrained Weights</h2>
+      <p class="text-neutral-700 dark:text-neutral-300 mb-4">Download the pretrained MotionAE checkpoint from Google Drive or via <code>gdown</code>. The page link is also in the hero badges above.</p>
+
+      <div class="rounded-2xl overflow-hidden border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+        <div class="flex items-center gap-2 px-4 py-2 border-b border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-800">
+          <span class="dot bg-red-500"></span>
+          <span class="dot bg-yellow-400"></span>
+          <span class="dot bg-green-500"></span>
+          <span class="ml-3 text-xs uppercase tracking-wider text-neutral-600 dark:text-neutral-300">Terminal — Download weights</span>
+          <button class="ml-auto text-xs underline decoration-dotted" data-copy="#cmd-weights">Copy</button>
+        </div>
+        <pre id="cmd-weights" class="px-4 py-4 text-sm leading-relaxed text-neutral-800 dark:text-neutral-100"><code>$ pip install gdown
+$ mkdir -p weights && cd weights
+$ gdown --fuzzy "https://drive.google.com/file/d/1dYFW_9yYElH_7etZhHoHO2bsn7DB_cQI/view?usp=sharing"
+# (optional) verify checksum if provided
+$ cd ..
+# Example load (adjust path to your script):
+$ python -c "import torch; m=torch.load('weights/autoencoder_humanml3d.pth', map_location='cpu'); print(type(m))"</code></pre>
       </div>
     </div>
   </section>
