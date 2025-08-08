@@ -17,8 +17,12 @@
     })();
   </script>
   <!-- Configure Tailwind CDN to use class-based dark mode -->
-  <script>tailwind = { config: { darkMode: 'class' } };</script>
-  <script defer src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Must be defined BEFORE loading the CDN script
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = { darkMode: 'class' };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     html { scroll-behavior: smooth; }
     .prose pre { white-space: pre-wrap; }
