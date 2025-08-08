@@ -41,55 +41,80 @@
       // else default light by removing dark (handled by default class below)
     })();
   </script>
+  <style>
+    /* --- CDN-agnostic theming using CSS variables (no Tailwind dark: needed) --- */
+    :root {
+      --bg: #fafafa; --fg: #111827; /* slate-900 */
+      --muted: #4b5563; --card: #ffffff; --card-border: #e5e7eb; --subtle: #f3f4f6;
+      --code-bg: #0b1020; --code-fg: #e5ecff; --code-border: #111a33;
+    }
+    [data-theme="dark"] {
+      --bg: #0a0a0a; --fg: #e5e7eb;
+      --muted: #9ca3af; --card: #0f0f12; --card-border: #1f2937; --subtle: #0b0b0d;
+      --code-bg: #0b1020; --code-fg: #e5ecff; --code-border: #111a33;
+    }
+
+    /* Apply globals via variables (wins over Tailwind default with !important) */
+    html, body { background: var(--bg) !important; color: var(--fg) !important; }
+    header { background: color-mix(in oklab, var(--bg) 85%, transparent) !important; border-color: var(--card-border) !important; }
+    section { border-color: var(--card-border) !important; }
+    .card { background: var(--card) !important; border-color: var(--card-border) !important; }
+    .muted { color: var(--muted) !important; }
+    .subtle { background: var(--subtle) !important; }
+
+    /* Terminal/Code blocks */
+    .term { background: var(--card) !important; border: 1px solid var(--card-border) !important; border-radius: 1rem; overflow: hidden; }
+    .term-head { background: var(--subtle) !important; border-bottom: 1px solid var(--card-border) !important; }
+    .term-pre { background: var(--code-bg) !important; color: var(--code-fg) !important; border-top: 1px solid var(--code-border); margin: 0; }
+    .term-pre code { color: var(--code-fg) !important; }
+  </style>
 </head>
-<body class="bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
+<body data-theme="light">
   <!-- Sticky header -->
-  <header class="sticky top-0 z-50 backdrop-blur bg-white/70 border-b border-neutral-200 dark:bg-neutral-950/70 dark:border-neutral-800">
+  <header class="sticky top-0 z-50 backdrop-blur">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
       <a href="#top" class="text-lg font-semibold">MotionAE</a>
-      <nav class="hidden md:flex gap-6 text-sm text-neutral-600 dark:text-neutral-300">
-        <a href="#paper" class="hover:text-black dark:hover:text-white">Paper</a>
-        <a href="#code" class="hover:text-black dark:hover:text-white">Code</a>
-        <a href="#abstract" class="hover:text-black dark:hover:text-white">Abstract</a>
-        <a href="#architecture" class="hover:text-black dark:hover:text-white">Architecture</a>
-        <a href="#metrics" class="hover:text-black dark:hover:text-white">Metrics</a>
-        <a href="#results" class="hover:text-black dark:hover:text-white">Results</a>
-        <a href="#reproduce" class="hover:text-black dark:hover:text-white">Reproduce</a>
-        <a href="#bibtex" class="hover:text-black dark:hover:text-white">BibTeX</a>
+      <nav class="hidden md:flex gap-6 text-sm muted">
+        <a href="#paper">Paper</a>
+        <a href="#code">Code</a>
+        <a href="#abstract">Abstract</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#metrics">Metrics</a>
+        <a href="#results">Results</a>
+        <a href="#reproduce">Reproduce</a>
+        <a href="#bibtex">BibTeX</a>
       </nav>
-      <button id="themeToggle" class="ml-4 rounded-full px-3 py-1 text-sm border border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900" aria-label="Toggle theme" title="Toggle light/dark">🌞/🌙</button>
+      <button id="themeToggle" class="ml-4 rounded-full px-3 py-1 text-sm border" aria-label="Toggle theme" title="Toggle light/dark">🌞/🌙</button>
     </div>
   </header>
 
   <!-- Hero -->
-  <section id="top" class="border-b border-neutral-200 bg-gradient-to-b from-neutral-100 to-neutral-50 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950">
+  <section id="top" class="subtle border-b">
     <div class="max-w-6xl mx-auto px-4 py-16 md:py-24">
-      <p class="text-sm uppercase tracking-widest text-neutral-500 dark:text-neutral-400">Project Preview</p>
+      <p class="text-sm uppercase tracking-widest muted">Project Preview</p>
       <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mt-2">MotionAE: Motion Autoencoder on HumanML3D</h1>
-      <p class="mt-4 text-neutral-700 max-w-3xl dark:text-neutral-300">A minimal autoencoder trained on HumanML3D for motion compression and reconstruction. This page shows the architecture, metrics (MSE/MAE/L2), and example visualizations, with links to code and environment.</p>
+      <p class="mt-4 muted max-w-3xl">A minimal autoencoder trained on HumanML3D for motion compression and reconstruction. This page shows the architecture, metrics (MSE/MAE/L2), and example visualizations, with links to code and environment.</p>
 
       <div class="mt-6 flex flex-wrap gap-3">
-        <a id="paper" href="#" class="px-3 py-1 rounded-full border border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900">arXiv (coming soon)</a>
-        <a id="code" href="#" class="px-3 py-1 rounded-full border border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900">Code</a>
-        <a href="#reproduce" class="px-3 py-1 rounded-full border border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900">Environment.yml</a>
-        <a id="weights" href="https://drive.google.com/file/d/1dYFW_9yYElH_7etZhHoHO2bsn7DB_cQI/view?usp=sharing" target="_blank" rel="noopener" class="px-3 py-1 rounded-full border border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900">Pretrained Weights</a>
+        <a id="paper" href="#" class="px-3 py-1 rounded-full border">arXiv (coming soon)</a>
+        <a id="code" href="#" class="px-3 py-1 rounded-full border">Code</a>
+        <a href="#reproduce" class="px-3 py-1 rounded-full border">Environment.yml</a>
+        <a id="weights" href="https://drive.google.com/file/d/1dYFW_9yYElH_7etZhHoHO2bsn7DB_cQI/view?usp=sharing" target="_blank" rel="noopener" class="px-3 py-1 rounded-full border">Pretrained Weights</a>
       </div>
 
-      <!-- Author block -->
-      <div class="mt-8 text-neutral-700 dark:text-neutral-300">
+      <div class="mt-8 muted">
         <p class="text-sm">Issam Alzouby</p>
-        <p class="text-xs text-neutral-500 dark:text-neutral-400">UNC Charlotte</p>
+        <p class="text-xs">UNC Charlotte</p>
       </div>
 
-      <!-- Cover media -->
       <div class="mt-10 grid md:grid-cols-2 gap-4">
-        <figure class="bg-white rounded-2xl p-3 border border-neutral-200 dark:bg-neutral-900 dark:border-neutral-800">
+        <figure class="card p-3">
           <img src="assets/teaser_reconstruction.gif" alt="Original vs Reconstructed motion teaser" class="w-full h-auto rounded-xl" />
-          <figcaption class="text-xs text-neutral-500 mt-2 dark:text-neutral-400">Original vs Reconstructed joint trajectories (teaser). Replace with your own GIF.</figcaption>
+          <figcaption class="text-xs muted mt-2">Original vs Reconstructed joint trajectories (teaser). Replace with your own GIF.</figcaption>
         </figure>
-        <figure class="bg-white rounded-2xl p-3 border border-neutral-200 dark:bg-neutral-900 dark:border-neutral-800">
+        <figure class="card p-3">
           <img src="assets/teaser_latent.png" alt="Latent space scatter" class="w-full h-auto rounded-xl" />
-          <figcaption class="text-xs text-neutral-500 mt-2 dark:text-neutral-400">Latent space preview (e.g., TSNE/UMAP). Replace with your own plot.</figcaption>
+          <figcaption class="text-xs muted mt-2">Latent space preview (e.g., TSNE/UMAP). Replace with your own plot.</figcaption>
         </figure>
       </div>
     </div>
@@ -204,14 +229,14 @@
       <p class="text-neutral-700 dark:text-neutral-300 mb-4">Download the pretrained MotionAE checkpoint from Google Drive or via <code>gdown</code>. The page link is also in the hero badges above.</p>
 
       <div class="rounded-2xl overflow-hidden border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
-        <div class="flex items-center gap-2 px-4 py-2 border-b border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-800">
+        <div class="term-head flex items-center gap-2 px-4 py-2">
           <span class="dot bg-red-500"></span>
           <span class="dot bg-yellow-400"></span>
           <span class="dot bg-green-500"></span>
           <span class="ml-3 text-xs uppercase tracking-wider text-neutral-600 dark:text-neutral-300">Terminal — Download weights</span>
           <button class="ml-auto text-xs underline decoration-dotted" data-copy="#cmd-weights">Copy</button>
         </div>
-        <pre id="cmd-weights" class="px-4 py-4 text-sm leading-relaxed text-neutral-800 dark:text-neutral-100"><code>$ pip install gdown
+        <pre id="cmd-$1" class="term-pre px-4 py-4 text-sm leading-relaxed"><code><code>$ pip install gdown
 $ mkdir -p weights && cd weights
 $ gdown --fuzzy "https://drive.google.com/file/d/1dYFW_9yYElH_7etZhHoHO2bsn7DB_cQI/view?usp=sharing"
 # (optional) verify checksum if provided
@@ -228,15 +253,15 @@ $ python -c "import torch; m=torch.load('weights/autoencoder_humanml3d.pth', map
       <h2 class="text-2xl font-semibold mb-4">Reproduce</h2>
 
       <!-- Terminal Card: Create env -->
-      <div class="rounded-2xl overflow-hidden border mb-6 border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
-        <div class="flex items-center gap-2 px-4 py-2 border-b border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-800">
+      <div class="term mb-6">
+        <div class="term-head flex items-center gap-2 px-4 py-2">
           <span class="dot bg-red-500"></span>
           <span class="dot bg-yellow-400"></span>
           <span class="dot bg-green-500"></span>
           <span class="ml-3 text-xs uppercase tracking-wider text-neutral-600 dark:text-neutral-300">Terminal — Create env</span>
           <button class="ml-auto text-xs underline decoration-dotted" data-copy="#cmd-env">Copy</button>
         </div>
-        <pre id="cmd-env" class="px-4 py-4 text-sm leading-relaxed text-neutral-800 dark:text-neutral-100"><code>$ conda env create -f environment.yml
+        <pre id="cmd-$1" class="term-pre px-4 py-4 text-sm leading-relaxed"><code><code>$ conda env create -f environment.yml
 $ conda activate momask
 $ python MotionAE.py      # trains & saves autoencoder_humanml3d.pth
 $ python aevalidate.py    # prints MSE / MAE / L2 and writes assets/metrics.json
@@ -244,15 +269,15 @@ $ python visualize.py     # generates plots into assets/</code></pre>
       </div>
 
       <!-- Terminal Card: Serve (GitHub Pages) -->
-      <div class="rounded-2xl overflow-hidden border mb-6 border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
-        <div class="flex items-center gap-2 px-4 py-2 border-b border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-800">
+      <div class="term mb-6">
+        <div class="term-head flex items-center gap-2 px-4 py-2">
           <span class="dot bg-red-500"></span>
           <span class="dot bg-yellow-400"></span>
           <span class="dot bg-green-500"></span>
           <span class="ml-3 text-xs uppercase tracking-wider text-neutral-600 dark:text-neutral-300">Terminal — GitHub Pages</span>
           <button class="ml-auto text-xs underline decoration-dotted" data-copy="#cmd-ghp">Copy</button>
         </div>
-        <pre id="cmd-ghp" class="px-4 py-4 text-sm leading-relaxed text-neutral-800 dark:text-neutral-100"><code># Option A: GitHub Pages (static)
+        <pre id="cmd-$1" class="term-pre px-4 py-4 text-sm leading-relaxed"><code><code># Option A: GitHub Pages (static)
 # Put index.html and assets/ in your repo root
 # Settings → Pages → Source: main /(root)
 
@@ -263,14 +288,14 @@ $ git push origin main</code></pre>
 
       <!-- Terminal Card: Serve (Vercel/Netlify) -->
       <div class="rounded-2xl overflow-hidden border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
-        <div class="flex items-center gap-2 px-4 py-2 border-b border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-800">
+        <div class="term-head flex items-center gap-2 px-4 py-2">
           <span class="dot bg-red-500"></span>
           <span class="dot bg-yellow-400"></span>
           <span class="dot bg-green-500"></span>
           <span class="ml-3 text-xs uppercase tracking-wider text-neutral-600 dark:text-neutral-300">Terminal — Vercel / Netlify</span>
           <button class="ml-auto text-xs underline decoration-dotted" data-copy="#cmd-deploy">Copy</button>
         </div>
-        <pre id="cmd-deploy" class="px-4 py-4 text-sm leading-relaxed text-neutral-800 dark:text-neutral-100"><code># Option B: Vercel (CLI)
+        <pre id="cmd-$1" class="term-pre px-4 py-4 text-sm leading-relaxed"><code><code># Option B: Vercel (CLI)
 $ npm i -g vercel
 $ vercel deploy
 
