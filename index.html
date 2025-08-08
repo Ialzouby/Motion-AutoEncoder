@@ -1,14 +1,23 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MotionAE — Motion Autoencoder</title>
   <meta name="description" content="MotionAE: A simple motion autoencoder on HumanML3D with visuals, metrics, and code links." />
   <!-- Configure Tailwind to use class-based dark mode -->
+  <!-- Set theme before styles to avoid FOUC -->
   <script>
-    window.tailwind = { config: { darkMode: 'class' } };
+    (function(){
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const saved = localStorage.getItem('theme');
+      const useDark = saved ? (saved === 'dark') : prefersDark;
+      if (useDark) document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+    })();
   </script>
+  <!-- Configure Tailwind CDN to use class-based dark mode -->
+  <script>tailwind = { config: { darkMode: 'class' } };</script>
   <script defer src="https://cdn.tailwindcss.com"></script>
   <style>
     html { scroll-behavior: smooth; }
@@ -44,7 +53,7 @@
         <a href="#reproduce" class="hover:text-black dark:hover:text-white">Reproduce</a>
         <a href="#bibtex" class="hover:text-black dark:hover:text-white">BibTeX</a>
       </nav>
-      <button id="themeToggle" class="ml-4 rounded-full px-3 py-1 text-sm border border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900" aria-label="Toggle theme">🌞/🌙</button>
+      <button id="themeToggle" class="ml-4 rounded-full px-3 py-1 text-sm border border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900" aria-label="Toggle theme" title="Toggle light/dark">🌞/🌙</button>
     </div>
   </header>
 
