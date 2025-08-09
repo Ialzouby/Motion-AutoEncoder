@@ -68,8 +68,21 @@
     .term-pre { background: var(--code-bg) !important; color: var(--code-fg) !important; border-top: 1px solid var(--code-border); margin: 0; }
     .term-pre code { color: var(--code-fg) !important; }
   </style>
+  <!-- Set initial theme on <html> BEFORE CSS to avoid flashes -->
+  <script>
+    (function(){
+      try {
+        var saved = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var initial = saved ? saved : (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', initial);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
 </head>
-<body data-theme="light">
+<body>
   <!-- Sticky header -->
   <header class="sticky top-0 z-50 backdrop-blur">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -328,7 +341,7 @@ $ vercel deploy
 
   <!-- Helpers -->
   <script>
-    // Year
+    // Year in footer
     document.getElementById('year').textContent = new Date().getFullYear();
 
     // Copy buttons for terminal blocks
@@ -337,21 +350,21 @@ $ vercel deploy
         const sel = btn.getAttribute('data-copy');
         const el = document.querySelector(sel);
         if (!el) return;
-        const text = el.textContent.replace(/^\$ /gm, ''); // strip prompts
+        const text = el.textContent.replace(/^\$ /gm, '');
         navigator.clipboard.writeText(text).then(() => {
-          const old = btn.textContent;
-          btn.textContent = 'Copied!';
+          const old = btn.textContent; btn.textContent = 'Copied!';
           setTimeout(() => (btn.textContent = old), 1200);
         });
       });
     });
 
-    // Theme toggle
-    const toggle = document.getElementById('themeToggle');
-    toggle.addEventListener('click', () => {
-      const html = document.documentElement;
-      const isDark = html.classList.toggle('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    // Theme toggle using data-theme on <html>
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const root = document.documentElement;
+      const current = root.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
     });
 
     // Load metrics.json if present
