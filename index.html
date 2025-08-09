@@ -1,378 +1,129 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MotionAE — Motion Autoencoder</title>
-  <meta name="description" content="MotionAE: A simple motion autoencoder on HumanML3D with visuals, metrics, and code links." />
+"use client";
 
-  <!-- 1) Set initial theme on <html data-theme> BEFORE CSS loads (no flash) -->
-  <script>
-    (function(){
-      try {
-        var saved = localStorage.getItem('theme');
-        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        var initial = saved ? saved : (prefersDark ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', initial);
-      } catch (e) {
-        document.documentElement.setAttribute('data-theme', 'light');
-      }
-    })();
-  </script>
+import { useState } from "react";
+import { notFound } from "next/navigation";
+import { productsData } from "@/../public/data/AllData";
+import Footer from "@/components/Shared/Footer/Footer";
+import CartModal from "@/components/Shared/Modal/CartModal";
 
-  <!-- 2) Tailwind CDN (no dark: variants needed, but fine to keep) -->
-  <script src="https://cdn.tailwindcss.com"></script>
+export default function ProductDetailsPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const product = productsData.find((p) => p.id === Number(params.id));
 
-  <!-- 3) Site styles with CSS variables (theme-agnostic) -->
-  <style>
-    html { scroll-behavior: smooth; }
-    .prose pre { white-space: pre-wrap; }
-    .dot { width: 12px; height: 12px; border-radius: 9999px; }
+  if (!product) return notFound();
 
-    /* ---- Light theme (default) ---- */
-    :root {
-      --bg: #ffffff;
-      --fg: #0f172a;          /* slate-900 */
-      --muted: #475569;       /* slate-600 */
-      --card: #ffffff;
-      --card-border: #e5e7eb; /* gray-200 */
-      --subtle: #f8fafc;      /* slate-50 */
-      --link: #2563eb;        /* blue-600 */
-      --link-hover: #1d4ed8;  /* blue-700 */
-      --code-bg: #f5f5f5;     /* light code backing */
-      --code-fg: #111827;     /* slate-900 */
-      --code-border: #d1d5db; /* gray-300 */
-    }
+  return (
+    <div className="mae-page" data-theme={theme}>
+      {/* Theme Toggle */}
+      <button
+        className="theme-toggle"
+        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+      >
+        <svg
+          stroke="currentColor"
+          fill="currentColor"
+          strokeWidth="0"
+          viewBox="0 0 256 256"
+          height="1.2em"
+          width="1.2em"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm8,24a64,64,0,1,0,64,64A64.07,64.07,0,0,0,128,64ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"></path>
+        </svg>
+      </button>
 
-    /* ---- Dark theme overrides ---- */
-    [data-theme="dark"] {
-      --bg: #0a0a0a;
-      --fg: #e5e7eb;          /* gray-200 */
-      --muted: #9ca3af;       /* gray-400 */
-      --card: #0f0f12;
-      --card-border: #1f2937; /* gray-800 */
-      --subtle: #0b0b0d;
-      --link: #93c5fd;        /* light blue */
-      --link-hover: #bfdbfe;
-      --code-bg: #0b1020;     /* deep indigo */
-      --code-fg: #e5ecff;
-      --code-border: #111a33;
-    }
+      <main>
+        <h1>Motion AutoEncoder</h1>
+        <p>
+          This project trains a motion autoencoder on the HumanML3D dataset and
+          provides tools for evaluation and visualization.
+        </p>
 
-    /* ---- Global application ---- */
-    html, body { background: var(--bg) !important; color: var(--fg) !important; }
-    a { color: var(--link); }
-    a:hover { color: var(--link-hover); }
-    header { background: color-mix(in oklab, var(--bg) 85%, transparent) !important; border-color: var(--card-border) !important; }
-    section { border-color: var(--card-border) !important; }
-    .card { background: var(--card) !important; border: 1px solid var(--card-border) !important; border-radius: 1rem; }
-    .muted { color: var(--muted) !important; }
-    .subtle { background: var(--subtle) !important; }
+        <h2>Reproduce</h2>
+        <pre>
+          <code>
+{`# Create env
+conda env create -f environment.yml
+conda activate momask
+python MotionAE.py   # trains and saves autoencoder_humanml3d.pth
+python aevalidate.py # prints MSE / MAE / L2 and optionally writes metrics.json
+python visualize.py  # generates plots into assets/
 
-    /* Terminal blocks */
-    .term { background: var(--card) !important; border: 1px solid var(--card-border) !important; border-radius: 1rem; overflow: hidden; }
-    .term-head { background: var(--subtle) !important; border-bottom: 1px solid var(--card-border) !important; }
-    .term-pre { background: var(--code-bg) !important; color: var(--code-fg) !important; border-top: 1px solid var(--code-border); margin: 0; }
-    .term-pre code { color: var(--code-fg) !important; }
-  </style>
-</head>
-<body>
-  <!-- Sticky header -->
-  <header class="sticky top-0 z-50 backdrop-blur border-b">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="#top" class="text-lg font-semibold">MotionAE</a>
-      <nav class="hidden md:flex gap-6 text-sm muted">
-        <a href="#paper">Paper</a>
-        <a href="#code">Code</a>
-        <a href="#abstract">Abstract</a>
-        <a href="#architecture">Architecture</a>
-        <a href="#metrics">Metrics</a>
-        <a href="#results">Results</a>
-        <a href="#reproduce">Reproduce</a>
-        <a href="#bibtex">BibTeX</a>
-      </nav>
-      <button id="themeToggle" class="ml-4 rounded-full px-3 py-1 text-sm border" aria-label="Toggle theme" title="Toggle light/dark">🌞/🌙</button>
+# Serve this page
+# Option A: GitHub Pages (static)
+# 1) Put this index.html and assets/ in a repo
+# 2) Settings → Pages → Deploy from main → /(root)
+
+# Option B: Vercel/Netlify
+# vercel deploy`}
+          </code>
+        </pre>
+
+        <h2>Pretrained Weights</h2>
+        <p>
+          <a
+            href="https://drive.google.com/file/d/1dYFW_9yYElH_7etZhHoHO2bsn7DB_cQI/view?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Download from Google Drive
+          </a>
+        </p>
+      </main>
+
+      <Footer />
+      <CartModal />
+
+      {/* -------- Page Styles -------- */}
+      <style jsx global>{`
+        .mae-page {
+          font-family: system-ui, sans-serif;
+          padding: 2rem;
+          max-width: 900px;
+          margin: auto;
+          transition: background 0.3s, color 0.3s;
+        }
+        [data-theme="light"] {
+          background: #ffffff;
+          color: #000000;
+        }
+        [data-theme="dark"] {
+          background: #121212;
+          color: #f0f0f0;
+        }
+        pre {
+          background: var(--code-bg);
+          color: var(--code-color);
+          padding: 1rem;
+          border-radius: 8px;
+          overflow-x: auto;
+          font-size: 0.9rem;
+        }
+        [data-theme="light"] {
+          --code-bg: #f5f5f5;
+          --code-color: #1a1a1a;
+        }
+        [data-theme="dark"] {
+          --code-bg: #1e1e1e;
+          --code-color: #eaeaea;
+        }
+        .theme-toggle {
+          position: fixed;
+          top: 1rem;
+          right: 1rem;
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-size: 1.5rem;
+        }
+        a {
+          color: #4da3ff;
+        }
+      `}</style>
     </div>
-  </header>
-
-  <!-- Hero -->
-  <section id="top" class="subtle border-b">
-    <div class="max-w-6xl mx-auto px-4 py-16 md:py-24">
-      <p class="text-sm uppercase tracking-widest muted">Project Preview</p>
-      <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mt-2">MotionAE: Motion Autoencoder on HumanML3D</h1>
-      <p class="mt-4 muted max-w-3xl">A minimal autoencoder trained on HumanML3D for motion compression and reconstruction. This page shows the architecture, metrics (MSE/MAE/L2), and example visualizations, with links to code and environment.</p>
-
-      <div class="mt-6 flex flex-wrap gap-3">
-        <a id="paper" href="#" class="px-3 py-1 rounded-full border">arXiv (coming soon)</a>
-        <a id="code" href="#" class="px-3 py-1 rounded-full border">Code</a>
-        <a href="#reproduce" class="px-3 py-1 rounded-full border">Environment.yml</a>
-        <a id="weights" href="https://drive.google.com/file/d/1dYFW_9yYElH_7etZhHoHO2bsn7DB_cQI/view?usp=sharing" target="_blank" rel="noopener" class="px-3 py-1 rounded-full border">Pretrained Weights</a>
-      </div>
-
-      <div class="mt-8 muted">
-        <p class="text-sm">Issam Alzouby</p>
-        <p class="text-xs">UNC Charlotte</p>
-      </div>
-
-      <div class="mt-10 grid md:grid-cols-2 gap-4">
-        <figure class="card p-3">
-          <img src="assets/teaser_reconstruction.gif" alt="Original vs Reconstructed motion teaser" class="w-full h-auto rounded-xl" />
-          <figcaption class="text-xs muted mt-2">Original vs Reconstructed joint trajectories (teaser). Replace with your own GIF.</figcaption>
-        </figure>
-        <figure class="card p-3">
-          <img src="assets/teaser_latent.png" alt="Latent space scatter" class="w-full h-auto rounded-xl" />
-          <figcaption class="text-xs muted mt-2">Latent space preview (e.g., TSNE/UMAP). Replace with your own plot.</figcaption>
-        </figure>
-      </div>
-    </div>
-  </section>
-
-  <!-- Abstract / Contributions -->
-  <section id="abstract" class="border-b">
-    <div class="max-w-6xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-10">
-      <div class="prose">
-        <h2>Abstract</h2>
-        <p>MotionAE is a lightweight autoencoder for human motion sequences built for clarity and speed. Trained on HumanML3D (SMPL‑H, 22 joints, 196 frames, 263‑D features), MotionAE learns a compact latent representation that reconstructs trajectories with low error while remaining straightforward to extend to VAE/VQ‑VAE variants.</p>
-      </div>
-      <div class="prose">
-        <h2>Contributions</h2>
-        <ul>
-          <li>Simple, reproducible baseline for motion reconstruction on HumanML3D.</li>
-          <li>Clean PyTorch code with <code>environment.yml</code> and scripts to train/validate/visualize.</li>
-          <li>Ready‑made figures (joint curves, latent previews) and a one‑page project site with light/dark mode.</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- Architecture -->
-  <section id="architecture" class="border-b subtle">
-    <div class="max-w-6xl mx-auto px-4 py-12">
-      <h2 class="text-2xl font-semibold">Architecture</h2>
-      <p class="mt-2 muted">A standard MLP autoencoder. Replace the diagram below with your own (SVG/PNG).</p>
-      <div class="mt-6 card p-5">
-        <img src="assets/architecture.png" alt="Architecture diagram" class="w-full h-auto rounded-xl"/>
-      </div>
-      <div class="mt-4 grid md:grid-cols-3 gap-4 text-sm muted">
-        <div class="p-4 card">
-          <div class="font-semibold text-[color:var(--fg)]">Input</div>
-          <div>196 × 263 flattened</div>
-        </div>
-        <div class="p-4 card">
-          <div class="font-semibold text-[color:var(--fg)]">Latent</div>
-          <div>512‑D</div>
-        </div>
-        <div class="p-4 card">
-          <div class="font-semibold text-[color:var(--fg)]">Loss</div>
-          <div>MSE (reconstruction)</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Metrics -->
-  <section id="metrics" class="border-b">
-    <div class="max-w-6xl mx-auto px-4 py-12">
-      <h2 class="text-2xl font-semibold">Validation Metrics</h2>
-      <p class="mt-2 muted">From <code>aevalidate.py</code> (averaged over the held‑out split).</p>
-      <div class="mt-6 overflow-x-auto">
-        <table class="min-w-full text-sm">
-          <thead>
-            <tr class="text-left muted">
-              <th class="py-2 pr-6">Metric</th>
-              <th class="py-2 pr-6">Value</th>
-              <th class="py-2">Notes</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y" style="--tw-divide-color: var(--card-border)">
-            <tr>
-              <td class="py-2 pr-6">MSE</td>
-              <td class="py-2 pr-6"><span id="mse">—</span></td>
-              <td class="py-2">Mean Squared Error (per sample mean)</td>
-            </tr>
-            <tr>
-              <td class="py-2 pr-6">MAE</td>
-              <td class="py-2 pr-6"><span id="mae">—</span></td>
-              <td class="py-2">Mean Absolute Error (per sample mean)</td>
-            </tr>
-            <tr>
-              <td class="py-2 pr-6">L2</td>
-              <td class="py-2 pr-6"><span id="l2">—</span></td>
-              <td class="py-2">Euclidean distance</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="text-xs muted mt-2">Tip: export a small <code>metrics.json</code> and fetch it below to auto‑fill these numbers.</p>
-    </div>
-  </section>
-
-  <!-- Results -->
-  <section id="results" class="border-b subtle">
-    <div class="max-w-6xl mx-auto px-4 py-12">
-      <h2 class="text-2xl font-semibold">Results & Visualizations</h2>
-      <p class="mt-2 muted">Drop your PNGs/GIFs into <code>assets/</code> and update captions.</p>
-      <div class="mt-6 grid md:grid-cols-3 gap-4">
-        <figure class="card p-3">
-          <img src="assets/joint0_x.png" alt="Joint 0 X over time" class="w-full h-auto rounded-xl" />
-          <figcaption class="text-xs muted mt-2">Joint 0 — X position vs time (original vs reconstructed).</figcaption>
-        </figure>
-        <figure class="card p-3">
-          <img src="assets/joint5_y.png" alt="Joint 5 Y over time" class="w-full h-auto rounded-xl" />
-          <figcaption class="text-xs muted mt-2">Joint 5 — Y position vs time.</figcaption>
-        </figure>
-        <figure class="card p-3">
-          <img src="assets/joint10_z.png" alt="Joint 10 Z over time" class="w-full h-auto rounded-xl" />
-          <figcaption class="text-xs muted mt-2">Joint 10 — Z position vs time.</figcaption>
-        </figure>
-      </div>
-    </div>
-  </section>
-
-  <!-- Weights -->
-  <section id="weights-section" class="border-b subtle">
-    <div class="max-w-6xl mx-auto px-4 py-12">
-      <h2 class="text-2xl font-semibold mb-4">Pretrained Weights</h2>
-      <p class="muted mb-4">Download the pretrained MotionAE checkpoint from Google Drive or via <code>gdown</code>. The page link is also in the hero badges above.</p>
-
-      <div class="term">
-        <div class="term-head flex items-center gap-2 px-4 py-2">
-          <span class="dot bg-red-500"></span>
-          <span class="dot bg-yellow-400"></span>
-          <span class="dot bg-green-500"></span>
-          <span class="ml-3 text-xs uppercase tracking-wider muted">Terminal — Download weights</span>
-          <button class="ml-auto text-xs underline decoration-dotted" data-copy="#cmd-weights">Copy</button>
-        </div>
-        <pre id="cmd-weights" class="term-pre px-4 py-4 text-sm leading-relaxed"><code>$ pip install gdown
-$ mkdir -p weights && cd weights
-$ gdown --fuzzy "https://drive.google.com/file/d/1dYFW_9yYElH_7etZhHoHO2bsn7DB_cQI/view?usp=sharing"
-# (optional) verify checksum if provided
-$ cd ..
-# Example load (adjust path to your script):
-$ python -c "import torch; m=torch.load('weights/autoencoder_humanml3d.pth', map_location='cpu'); print(type(m))"</code></pre>
-      </div>
-    </div>
-  </section>
-
-  <!-- Reproduce (Terminal-style blocks) -->
-  <section id="reproduce" class="border-b">
-    <div class="max-w-6xl mx-auto px-4 py-12">
-      <h2 class="text-2xl font-semibold mb-4">Reproduce</h2>
-
-      <!-- Terminal Card: Create env -->
-      <div class="term mb-6">
-        <div class="term-head flex items-center gap-2 px-4 py-2">
-          <span class="dot bg-red-500"></span>
-          <span class="dot bg-yellow-400"></span>
-          <span class="dot bg-green-500"></span>
-          <span class="ml-3 text-xs uppercase tracking-wider muted">Terminal — Create env</span>
-          <button class="ml-auto text-xs underline decoration-dotted" data-copy="#cmd-env">Copy</button>
-        </div>
-        <pre id="cmd-env" class="term-pre px-4 py-4 text-sm leading-relaxed"><code>$ conda env create -f environment.yml
-$ conda activate momask
-$ python MotionAE.py      # trains & saves autoencoder_humanml3d.pth
-$ python aevalidate.py    # prints MSE / MAE / L2 and writes assets/metrics.json
-$ python visualize.py     # generates plots into assets/</code></pre>
-      </div>
-
-      <!-- Terminal Card: Serve (GitHub Pages) -->
-      <div class="term mb-6">
-        <div class="term-head flex items-center gap-2 px-4 py-2">
-          <span class="dot bg-red-500"></span>
-          <span class="dot bg-yellow-400"></span>
-          <span class="dot bg-green-500"></span>
-          <span class="ml-3 text-xs uppercase tracking-wider muted">Terminal — GitHub Pages</span>
-          <button class="ml-auto text-xs underline decoration-dotted" data-copy="#cmd-ghp">Copy</button>
-        </div>
-        <pre id="cmd-ghp" class="term-pre px-4 py-4 text-sm leading-relaxed"><code># Option A: GitHub Pages (static)
-# Put index.html and assets/ in your repo root
-# Settings → Pages → Source: main /(root)
-
-$ git add .
-$ git commit -m "Deploy MotionAE page"
-$ git push origin main</code></pre>
-      </div>
-
-      <!-- Terminal Card: Serve (Vercel/Netlify) -->
-      <div class="term">
-        <div class="term-head flex items-center gap-2 px-4 py-2">
-          <span class="dot bg-red-500"></span>
-          <span class="dot bg-yellow-400"></span>
-          <span class="dot bg-green-500"></span>
-          <span class="ml-3 text-xs uppercase tracking-wider muted">Terminal — Vercel / Netlify</span>
-          <button class="ml-auto text-xs underline decoration-dotted" data-copy="#cmd-deploy">Copy</button>
-        </div>
-        <pre id="cmd-deploy" class="term-pre px-4 py-4 text-sm leading-relaxed"><code># Option B: Vercel (CLI)
-$ npm i -g vercel
-$ vercel deploy
-
-# Option B: Netlify (drag-and-drop)
-# Drop the folder in the Netlify dashboard</code></pre>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- BibTeX -->
-  <section id="bibtex" class="border-b subtle">
-    <div class="max-w-6xl mx-auto px-4 py-12 prose">
-      <h2>BibTeX</h2>
-      <pre><code>@misc{alzouby2025motionae,
-  title  = {MotionAE: A Minimal Motion Autoencoder Baseline},
-  author = {Issam Alzouby},
-  year   = {2025},
-  url    = {https://ialzouby.github.io/Motion-AutoEncoder/}
-}</code></pre>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="py-10 text-center text-sm muted">
-    <div class="max-w-6xl mx-auto px-4">
-      <p>© <span id="year"></span> MotionAE • Built with Tailwind • <a href="#top" class="underline decoration-dotted">Back to top</a></p>
-    </div>
-  </footer>
-
-  <!-- Helpers -->
-  <script>
-    // Year
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    // Copy buttons for terminal blocks
-    document.querySelectorAll('[data-copy]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const sel = btn.getAttribute('data-copy');
-        const el = document.querySelector(sel);
-        if (!el) return;
-        const text = el.textContent.replace(/^\$ /gm, '');
-        navigator.clipboard.writeText(text).then(() => {
-          const old = btn.textContent;
-          btn.textContent = 'Copied!';
-          setTimeout(() => (btn.textContent = old), 1200);
-        });
-      });
-    });
-
-    // Theme toggle (flips <html data-theme>)
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      const root = document.documentElement;
-      const current = root.getAttribute('data-theme') || 'light';
-      const next = current === 'dark' ? 'light' : 'dark';
-      root.setAttribute('data-theme', next);
-      try { localStorage.setItem('theme', next); } catch (e) {}
-    });
-
-    // Load metrics.json if present
-    (async () => {
-      try {
-        const r = await fetch('assets/metrics.json');
-        if (!r.ok) return;
-        const m = await r.json();
-        if (m.mse) document.getElementById('mse').textContent = Number(m.mse).toFixed(6);
-        if (m.mae) document.getElementById('mae').textContent = Number(m.mae).toFixed(6);
-        if (m.l2)  document.getElementById('l2').textContent  = Number(m.l2).toFixed(6);
-      } catch (e) { /* no-op */ }
-    })();
-  </script>
-</body>
-</html>
+  );
+}
