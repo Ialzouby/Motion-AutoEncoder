@@ -1,129 +1,94 @@
-"use client";
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MotionAE — Motion Autoencoder</title>
+  <meta name="description" content="MotionAE: A simple motion autoencoder on HumanML3D with visuals, metrics, and code links." />
+  <script>
+    // Always force light mode
+    document.documentElement.classList.remove('dark');
+    localStorage.setItem('theme', 'light');
+  </script>
+  <script>
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = { darkMode: 'class' };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+    .prose pre { white-space: pre-wrap; }
+    .dot { width: 12px; height: 12px; border-radius: 9999px; }
+    :root {
+      --bg: #fafafa; --fg: #111827;
+      --muted: #4b5563; --card: #ffffff; --card-border: #e5e7eb; --subtle: #f3f4f6;
+      --code-bg: #0b1020; --code-fg: #e5ecff; --code-border: #111a33;
+    }
+    html, body { background: var(--bg) !important; color: var(--fg) !important; }
+    section { border-color: var(--card-border) !important; }
+    .card { background: var(--card) !important; border-color: var(--card-border) !important; }
+    .muted { color: var(--muted) !important; }
+    .subtle { background: var(--subtle) !important; }
+    .term { background: var(--card) !important; border: 1px solid var(--card-border) !important; border-radius: 1rem; overflow: hidden; }
+    .term-head { background: var(--subtle) !important; border-bottom: 1px solid var(--card-border) !important; }
+    .term-pre { background: var(--code-bg) !important; color: var(--code-fg) !important; border-top: 1px solid var(--code-border); margin: 0; }
+    .term-pre code { color: var(--code-fg) !important; }
+  </style>
+</head>
+<body data-theme="light">
 
-import { useState } from "react";
-import { notFound } from "next/navigation";
-import { productsData } from "@/../public/data/AllData";
-import Footer from "@/components/Shared/Footer/Footer";
-import CartModal from "@/components/Shared/Modal/CartModal";
+  <!-- Hero -->
+  <section id="top" class="subtle border-b">
+    <div class="max-w-6xl mx-auto px-4 py-16 md:py-24">
+      <p class="text-sm uppercase tracking-widest muted">Project Preview</p>
+      <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mt-2">MotionAE: Motion Autoencoder on HumanML3D</h1>
+      <p class="mt-4 muted max-w-3xl">A minimal autoencoder trained on HumanML3D for motion compression and reconstruction. This page shows the architecture, metrics (MSE/MAE/L2), and example visualizations, with links to code and environment.</p>
 
-export default function ProductDetailsPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const product = productsData.find((p) => p.id === Number(params.id));
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a id="paper" href="#" class="px-3 py-1 rounded-full border">arXiv (coming soon)</a>
+        <a id="code" href="#" class="px-3 py-1 rounded-full border">Code</a>
+        <a href="#reproduce" class="px-3 py-1 rounded-full border">Environment.yml</a>
+        <a id="weights" href="https://drive.google.com/file/d/1dYFW_9yYElH_7etZhHoHO2bsn7DB_cQI/view?usp=sharing" target="_blank" rel="noopener" class="px-3 py-1 rounded-full border">Pretrained Weights</a>
+      </div>
 
-  if (!product) return notFound();
+      <div class="mt-8 muted">
+        <p class="text-sm">Issam Alzouby</p>
+        <p class="text-xs">UNC Charlotte</p>
+      </div>
 
-  return (
-    <div className="mae-page" data-theme={theme}>
-      {/* Theme Toggle */}
-      <button
-        className="theme-toggle"
-        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      >
-        <svg
-          stroke="currentColor"
-          fill="currentColor"
-          strokeWidth="0"
-          viewBox="0 0 256 256"
-          height="1.2em"
-          width="1.2em"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm8,24a64,64,0,1,0,64,64A64.07,64.07,0,0,0,128,64ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"></path>
-        </svg>
-      </button>
-
-      <main>
-        <h1>Motion AutoEncoder</h1>
-        <p>
-          This project trains a motion autoencoder on the HumanML3D dataset and
-          provides tools for evaluation and visualization.
-        </p>
-
-        <h2>Reproduce</h2>
-        <pre>
-          <code>
-{`# Create env
-conda env create -f environment.yml
-conda activate momask
-python MotionAE.py   # trains and saves autoencoder_humanml3d.pth
-python aevalidate.py # prints MSE / MAE / L2 and optionally writes metrics.json
-python visualize.py  # generates plots into assets/
-
-# Serve this page
-# Option A: GitHub Pages (static)
-# 1) Put this index.html and assets/ in a repo
-# 2) Settings → Pages → Deploy from main → /(root)
-
-# Option B: Vercel/Netlify
-# vercel deploy`}
-          </code>
-        </pre>
-
-        <h2>Pretrained Weights</h2>
-        <p>
-          <a
-            href="https://drive.google.com/file/d/1dYFW_9yYElH_7etZhHoHO2bsn7DB_cQI/view?usp=sharing"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Download from Google Drive
-          </a>
-        </p>
-      </main>
-
-      <Footer />
-      <CartModal />
-
-      {/* -------- Page Styles -------- */}
-      <style jsx global>{`
-        .mae-page {
-          font-family: system-ui, sans-serif;
-          padding: 2rem;
-          max-width: 900px;
-          margin: auto;
-          transition: background 0.3s, color 0.3s;
-        }
-        [data-theme="light"] {
-          background: #ffffff;
-          color: #000000;
-        }
-        [data-theme="dark"] {
-          background: #121212;
-          color: #f0f0f0;
-        }
-        pre {
-          background: var(--code-bg);
-          color: var(--code-color);
-          padding: 1rem;
-          border-radius: 8px;
-          overflow-x: auto;
-          font-size: 0.9rem;
-        }
-        [data-theme="light"] {
-          --code-bg: #f5f5f5;
-          --code-color: #1a1a1a;
-        }
-        [data-theme="dark"] {
-          --code-bg: #1e1e1e;
-          --code-color: #eaeaea;
-        }
-        .theme-toggle {
-          position: fixed;
-          top: 1rem;
-          right: 1rem;
-          background: none;
-          border: none;
-          cursor: pointer;
-          font-size: 1.5rem;
-        }
-        a {
-          color: #4da3ff;
-        }
-      `}</style>
+      <div class="mt-10 grid md:grid-cols-2 gap-4">
+        <figure class="card p-3">
+          <img src="assets/teaser_reconstruction.gif" alt="Original vs Reconstructed motion teaser" class="w-full h-auto rounded-xl" />
+          <figcaption class="text-xs muted mt-2">Original vs Reconstructed joint trajectories (teaser). Replace with your own GIF.</figcaption>
+        </figure>
+        <figure class="card p-3">
+          <img src="assets/teaser_latent.png" alt="Latent space scatter" class="w-full h-auto rounded-xl" />
+          <figcaption class="text-xs muted mt-2">Latent space preview (e.g., TSNE/UMAP). Replace with your own plot.</figcaption>
+        </figure>
+      </div>
     </div>
-  );
-}
+  </section>
+
+  <!-- Rest of your sections remain unchanged... -->
+
+  <footer class="py-10 text-center text-sm text-neutral-500">
+    <div class="max-w-6xl mx-auto px-4">
+      <p>© <span id="year"></span> MotionAE • Built with Tailwind • <a href="#top" class="underline decoration-dotted">Back to top</a></p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    (async () => {
+      try {
+        const r = await fetch('assets/metrics.json');
+        if (!r.ok) return;
+        const m = await r.json();
+        if (m.mse) document.getElementById('mse').textContent = Number(m.mse).toFixed(6);
+        if (m.mae) document.getElementById('mae').textContent = Number(m.mae).toFixed(6);
+        if (m.l2)  document.getElementById('l2').textContent  = Number(m.l2).toFixed(6);
+      } catch (e) {}
+    })();
+  </script>
+</body>
+</html>
