@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MotionAE — Motion Autoencoder</title>
   <meta name="description" content="MotionAE: A simple motion autoencoder on HumanML3D with visuals, metrics, and code links." />
-  <script>
-    // Always force light mode
-    document.documentElement.classList.remove('dark');
-    localStorage.setItem('theme', 'light');
-  </script>
+  <!-- Tailwind with class-based dark mode -->
   <script>
     window.tailwind = window.tailwind || {};
     window.tailwind.config = { darkMode: 'class' };
@@ -24,18 +20,26 @@
       --muted: #4b5563; --card: #ffffff; --card-border: #e5e7eb; --subtle: #f3f4f6;
       --code-bg: #0b1020; --code-fg: #e5ecff; --code-border: #111a33;
     }
+    [data-theme="dark"] {
+      --bg: #0a0a0a; --fg: #e5e7eb;
+      --muted: #9ca3af; --card: #0f0f12; --card-border: #1f2937; --subtle: #0b0b0d;
+      --code-bg: #0b1020; --code-fg: #e5ecff; --code-border: #111a33;
+    }
     html, body { background: var(--bg) !important; color: var(--fg) !important; }
-    section { border-color: var(--card-border) !important; }
-    .card { background: var(--card) !important; border-color: var(--card-border) !important; }
     .muted { color: var(--muted) !important; }
     .subtle { background: var(--subtle) !important; }
+    .card { background: var(--card) !important; border-color: var(--card-border) !important; }
     .term { background: var(--card) !important; border: 1px solid var(--card-border) !important; border-radius: 1rem; overflow: hidden; }
     .term-head { background: var(--subtle) !important; border-bottom: 1px solid var(--card-border) !important; }
-    .term-pre { background: var(--code-bg) !important; color: var(--code-fg) !important; border-top: 1px solid var(--code-border); margin: 0; }
+    .term-pre { background: var(--code-bg) !important; color: var(--code-fg) !important; margin: 0; }
     .term-pre code { color: var(--code-fg) !important; }
   </style>
 </head>
-<body data-theme="light">
+<body data-theme="light" class="relative">
+  <!-- Theme Toggle Button (top-right) -->
+  <button id="themeToggle" class="absolute top-4 right-4 rounded-full px-3 py-1 text-sm border z-50" aria-label="Toggle theme" title="Toggle light/dark">
+    🌞/🌙
+  </button>
 
   <!-- Hero -->
   <section id="top" class="subtle border-b">
@@ -69,16 +73,18 @@
     </div>
   </section>
 
-  <!-- Rest of your sections remain unchanged... -->
-
-  <footer class="py-10 text-center text-sm text-neutral-500">
-    <div class="max-w-6xl mx-auto px-4">
-      <p>© <span id="year"></span> MotionAE • Built with Tailwind • <a href="#top" class="underline decoration-dotted">Back to top</a></p>
-    </div>
-  </footer>
+  <!-- Rest of your sections remain unchanged -->
 
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+    // Theme toggle
+    const toggle = document.getElementById('themeToggle');
+    toggle.addEventListener('click', () => {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+
+    // Load metrics.json if present
     (async () => {
       try {
         const r = await fetch('assets/metrics.json');
@@ -87,7 +93,7 @@
         if (m.mse) document.getElementById('mse').textContent = Number(m.mse).toFixed(6);
         if (m.mae) document.getElementById('mae').textContent = Number(m.mae).toFixed(6);
         if (m.l2)  document.getElementById('l2').textContent  = Number(m.l2).toFixed(6);
-      } catch (e) {}
+      } catch {}
     })();
   </script>
 </body>
